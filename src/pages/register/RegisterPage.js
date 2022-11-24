@@ -1,6 +1,8 @@
+import { Alert } from "@mui/material";
 import React, { useState } from "react";
-import {useDispatch} from 'react-redux';
-import { fetchRegister } from "../../store/features/authSlice";
+import {useDispatch, useSelector} from 'react-redux';
+import { Link } from "react-router-dom";
+import { fetchRegister } from "../../store/features/AuthSlice";
 
 function RegisterPage() {
 
@@ -8,18 +10,39 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setrePassword] = useState("");
+  const [isValid, setIsValid] = useState(true);
+  const [alertMessage, setAlertMessage]= useState("");
+  const isSave = useSelector((state) => state.auth.isSave);
 
   const dispatch = useDispatch();
-  const register = async () => {
+  const register = async (e) => {
+    e.preventDefault();
+
     const auth = {
       username,
       email,
       password,
     };
-    dispatch(fetchRegister(auth));
+    console.log(checkPassword());
+    const response = await checkPassword();
+
+    if (response) {
+      dispatch(fetchRegister(auth));
+    }
   };
 
-  const onChangeUsername = (e) => {};
+  const checkPassword = async () => {
+    console.log(password);
+    console.log(rePassword);
+    if (password === rePassword) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+      dispatch(setAlertMessage("Şifreler Uyuşmuyor"));
+    }
+    return isValid;
+  };
+
   return (
     <div className="login">
       <div className="loginWrapper">
@@ -36,14 +59,29 @@ function RegisterPage() {
             <input placeholder="Email"  onChange={(e)=> setEmail(e.target.value)} className="loginInput" />
             <input placeholder="Password"  onChange={(e)=> setPassword(e.target.value)}  className="loginInput" />
             <input placeholder="Password Again"  onChange={(e)=> setrePassword(e.target.value)} className="loginInput" />
-            <button className="loginButton bg-purple-800" onClick={register} >Kayıt ol</button>
+                   
+            {isValid && isSave ? (
+              <Alert variant="filled" severity="success">
+                {alertMessage}
+              </Alert>
+            ) : (
+              <Alert variant="filled" severity="error">
+                {alertMessage}
+              </Alert>
+            )}           
+
+            <button className="loginButton bg-purple-800" onClick={register} >Kayıt ol</button>            
+            <Link to="/">
             <button className="loginRegisterButton bg-lime-600" >
               Hesabınla Giriş Yap
             </button>
+            </Link>   
+                    
           </div>
         </div>
       </div>
     </div>
+    
   );
 }
 

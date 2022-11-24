@@ -6,7 +6,9 @@ const initialStateAuth = {
     auth: [],
     isLoading: false,
     isLoadingRegister: false,
+    isSave: false,
     code: 0,
+    alertMessage: "",
     error: {
       code: "",
       message: "",
@@ -59,32 +61,43 @@ const authSlice = createSlice({
     name: "auth",
     initialState: initialStateAuth,
   
-    reducers: {},
+    reducers: {
+      setAllertMsssage: (state, action) => {
+        state.alertMessage = action.payload;
+      },
+  
+      logout: (state, action) => {
+        state.token = "";
+        state.isAuthanticated = false;
+      },
+    },
     extraReducers: (build) => {
       build.addCase(fetchRegister.fulfilled, (state, action) => {
         if (action.payload.code === 200) {
           state.auth = action.payload;
+          state.isSave = true;
+          state.alertMessage = "Kayıt Başarılı";
         } else {
           state.error = action.payload;
+          state.isSave = false;
+          state.alertMessage = "Kayıt başarısız";
         }
         console.log(state.error);
-        console.log(state.auth);  
+        console.log(state.auth);
+  
         state.isLoadingRegister = false;
       });
-
       build.addCase(fetchRegister.pending, (state, action) => {
         state.isLoadingRegister = true;
+        state.isSave = false;
       });
-      
       build.addCase(fetchRegister.rejected, (state, action) => {
         state.isLoadingRegister = false;
+        state.isSave = false;
+        state.alertMessage = "Kayıt başarısız";
       });
-
-      build.addCase(fetchLogin.pending,(state)=>{
-        state.isLoadingLogin=true;
-      });    
-      
-      build.addCase(fetchLogin.fulfilled,(state,action)=>{
+  
+      build.addCase(fetchLogin.fulfilled, (state, action) => {
         if (action.payload.code === 200) {
           state.token = action.payload.token;
           state.isAuthanticated = true;
@@ -94,15 +107,15 @@ const authSlice = createSlice({
           console.log(state.error);
         }
   
-        state.isLoading = false;       
+        state.isLoading = false;
       });
-     
-      build.addCase(fetchLogin.rejected,(state)=>{
-                 state.isLoadingLogin=false;
+      build.addCase(fetchLogin.pending, (state, action) => {
+        state.isLoading = true;
       });
-
-
+      build.addCase(fetchLogin.rejected, (state, action) => {
+        state.isLoading = false;
+      });
     },
   });
-
+  export const { setAllertMsssage, logout } = authSlice.actions;
 export default authSlice.reducer;
