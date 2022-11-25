@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Feed from "../../component/feed/Feed";
+import Rightbar from "../../component/rightbar/Rightbar";
+import Sidebar from "../../component/sidebar/Sidebar";
 import Topbar from "../../component/topbar/Topbar";
 import { findbyTokenwithAxios } from "../../store/features/UserSlice";
 
@@ -9,7 +11,8 @@ function HomePage() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userProfile);
   const getUser = async () => {
-    await dispatch(findbyTokenwithAxios(token)).then(console.log(user));
+    const response = await dispatch(findbyTokenwithAxios(token));
+    console.log(response);
   };
 
   useEffect(() => {
@@ -20,9 +23,9 @@ function HomePage() {
     <>
       <Topbar></Topbar>
       <div className="homeContainer">
-        <div>{user.username}</div>
+        <Sidebar></Sidebar>
         <Feed></Feed>
-        <div>right bar</div>
+        <Rightbar></Rightbar>
       </div>
     </>
   );

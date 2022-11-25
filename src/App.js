@@ -1,23 +1,28 @@
 import "./App.css";
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
-import HomePage from "./pages/home/HomePage";
-import {BrowserRouter, Routes,Route} from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import { useSelector } from "react-redux";
+import HomePage from "./pages/home/HomePage";
 
 function App() {
-  const islogin = useSelector(state=> state.auth.isAuthenticated)
+  const isLogin = useSelector((state) => state.auth.isAuthanticated);
+
   return (
     <div className="App">
-          <BrowserRouter>
-      <Routes>
-      <Route path="/" element={islogin ? <HomePage /> : <LoginPage />} />
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
-    </BrowserRouter>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={isLogin ? <HomePage></HomePage> : <LoginPage></LoginPage>}
+          ></Route>
+          <Route
+            path="/register"
+            element={<RegisterPage></RegisterPage>}
+          ></Route>
+        </Routes>
+      </BrowserRouter>
     </div>
-
   );
 }
 
