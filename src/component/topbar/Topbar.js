@@ -6,8 +6,8 @@ import {
   Search,
   Settings,
 } from "@mui/icons-material";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./topbar.css";
 import {
   Avatar,
@@ -19,17 +19,29 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/features/AuthSlice";
+import { findbyTokenwithAxios } from "../../store/features/UserSlice";
+import SearchComponent from "../search/SearchComponent";
 function Topbar() {
-  const username = useSelector((state) => state.user.userProfile.username);
+  const user = useSelector((state) => state.user.userProfile);
   const isAuthanticated = useSelector((state) => state.auth.isAuthanticated);
   const [anchorEl, setAnchorEl] = useState(null);
-
+  const token = useSelector((state) => state.auth.token);
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const getUser = async () => {
+    const response = await dispatch(findbyTokenwithAxios({ token }));
+  };
+  const navigate = useNavigate();
+  const gotoprofile = () => {
+    navigate("/profile/" + user.id);
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
   const dispatch = useDispatch();
   const logoutTop = () => {
     dispatch(logout());
@@ -41,18 +53,16 @@ function Topbar() {
         <span className="logo">Social Media</span>
       </div>
       <div className="topbarCenter">
-        <div className="searchbar">
-          <Search className="searchIcon" />
-          <input
-            placeholder="Search for friend, post or video"
-            className="searchInput"
-          />
-        </div>
+        <SearchComponent></SearchComponent>
       </div>
 
       <div className="topbarRight">
         <div className="topbarLinks">
-          <Link to={"/"} className="topbarLink hover:text-lime-300">
+          <Link
+            to={"/"}
+            //   onClick={() => dispatch(setUserIdforPosts(""))}
+            className="topbarLink hover:text-lime-300"
+          >
             Ana Sayfa
           </Link>
         </div>
@@ -132,9 +142,9 @@ function Topbar() {
           >
             <MenuItem>
               <Avatar />
-              <Link to={"/profile"} className=" mx-2">
-                {username}
-              </Link>
+              <button onClick={gotoprofile} className=" mx-2">
+                {user.username}
+              </button>
             </MenuItem>
             <Divider />
             <MenuItem>

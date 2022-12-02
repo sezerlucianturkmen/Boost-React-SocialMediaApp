@@ -4,6 +4,7 @@ import RegisterPage from "./pages/register/RegisterPage";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import { useSelector } from "react-redux";
 import HomePage from "./pages/home/HomePage";
+import Profile from "./pages/profile/Profile";
 
 function App() {
   const isLogin = useSelector((state) => state.auth.isAuthanticated);
@@ -19,6 +20,10 @@ function App() {
           <Route
             path="/register"
             element={<RegisterPage></RegisterPage>}
+          ></Route>
+          <Route
+            path="/profile/:id"
+            element={isLogin ? <Profile></Profile> : <LoginPage></LoginPage>}
           ></Route>
         </Routes>
       </BrowserRouter>
