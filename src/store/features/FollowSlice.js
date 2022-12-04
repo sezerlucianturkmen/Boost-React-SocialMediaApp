@@ -3,6 +3,7 @@ import followService from "../../config/FollowService";
 
 const initialStateFollow = {
   isLoading: false,
+  followListSizeIsChange: false,
   follows: [],
   userProfileList: [],
   follow: {
@@ -57,6 +58,47 @@ export const findFollowsByToken = createAsyncThunk(
     }
   }
 );
+export const createfollows = createAsyncThunk(
+  "follow/createfollows",
+
+  async (payload) => {
+    try {
+      const response = await fetch(followService.createfollows, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+      return response;
+    } catch (err) {
+      return err.response;
+    }
+  }
+);
+
+export const deleteFollow = createAsyncThunk(
+  "follow/deletefollow",
+
+  async (payload) => {
+    try {
+      const response = await fetch(followService.deletefollows, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.log(error));
+      return response;
+    } catch (err) {
+      return err.response;
+    }
+  }
+);
 const followSlice = createSlice({
   name: "follow",
   initialState: initialStateFollow,
@@ -84,6 +126,38 @@ const followSlice = createSlice({
     });
     build.addCase(findFollowsByToken.pending, (state, action) => {
       state.isLoading = true;
+    });
+    build.addCase(createfollows.fulfilled, (state, action) => {
+      // state.follows = [...state.follows, action.payload];
+      state.follows.unshift(action.payload);
+      state.isLoading = false;
+      state.followListSizeIsChange = true;
+    });
+    build.addCase(createfollows.rejected, (state, action) => {
+      state.error = action.payload;
+      state.isLoading = false;
+      state.followListSizeIsChange = false;
+    });
+    build.addCase(createfollows.pending, (state, action) => {
+      state.isLoading = true;
+      state.followListSizeIsChange = false;
+    });
+    build.addCase(deleteFollow.fulfilled, (state, action) => {
+      state.follows = state.follows.filter(
+        (x) => x.followId !== action.payload.followId
+      );
+
+      state.isLoading = false;
+      state.followListSizeIsChange = true;
+    });
+    build.addCase(deleteFollow.rejected, (state, action) => {
+      state.error = action.payload;
+      state.isLoading = false;
+      state.followListSizeIsChange = false;
+    });
+    build.addCase(deleteFollow.pending, (state, action) => {
+      state.isLoading = true;
+      state.followListSizeIsChange = false;
     });
   },
 });

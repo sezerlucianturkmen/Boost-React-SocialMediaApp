@@ -3,14 +3,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { findFollowsByToken } from "../../store/features/FollowSlice";
 import { findallUser } from "../../store/features/UserSlice";
+import ProfileButton from "../profileButton/ProfileButton";
 
 function SearchModal({ query, setHidden }) {
   const userProfileList = useSelector((state) => state.user.userProfileList);
+  const currentUserId = useSelector((state) => state.user.currentUserId);
   const follows = useSelector((state) => state.follow.follows);
   const token = useSelector((state) => state.auth.token);
   const followListSize = follows.length;
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userProfile);
+  const followListSizeIsChange = useSelector(
+    (state) => state.follow.followListSizeIsChange
+  );
   const [users, setUsers] = useState([]);
 
   const getAllUSer = async () => {
@@ -34,10 +39,8 @@ function SearchModal({ query, setHidden }) {
     setHidden(true);
   };
   useEffect(() => {
-    if (followListSize <= 0) {
-      dispatch(findFollowsByToken({ token }));
-    }
-  }, []);
+    dispatch(findFollowsByToken({ token }));
+  }, [followListSizeIsChange]);
 
   useEffect(() => {
     filterUsername();
@@ -69,10 +72,12 @@ function SearchModal({ query, setHidden }) {
                 </span>
               </Link>
 
-              {follows.find((x) => x.followId !== data.id) && (
-                <button className="bg-lime-300 rounded-lg px-2 py-2 hover:bg-purple-300 ">
-                  Takip et
-                </button>
+              {!follows.find((x) => x.followId == data.id) && (
+                <ProfileButton
+                  followId={data.id}
+                  currentUserId={currentUserId}
+                  action={"ekle"}
+                ></ProfileButton>
               )}
             </li>
           ))}

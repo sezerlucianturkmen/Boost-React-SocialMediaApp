@@ -39,7 +39,7 @@ export default function Rightbar({ profile, id }) {
 
     useEffect(() => {
       getFollows();
-    }, []);
+    }, [id]);
 
     return (
       <>
